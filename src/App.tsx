@@ -10,6 +10,8 @@ type MessageType = {
         name: string
     }
 }
+type clientIdentificationType=
+    {id: string, name: string}
 
 const socket = io('http://localhost:8000/')
 
@@ -17,6 +19,7 @@ const socket = io('http://localhost:8000/')
 function App() {
     const [messages, setMessages] = useState<MessageType[]>([])
     const [name, setName] = useState<string>('')
+    const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('')
 
     const sendMessage = () => {
@@ -24,7 +27,13 @@ function App() {
         setNewMessage('')
     }
     const submitName = () => {
-        alert(name)
+        if (name.trim() !== '') {
+            socket.emit('client-add_name', name)
+            setIsIdentificete(true)
+        } else {
+            alert('Enter name')
+        }
+
     }
 
     useEffect(() => {
@@ -34,7 +43,11 @@ function App() {
         socket.on('new-message-sent', (newMessage: MessageType) => {
             setMessages((messages) => [...messages, newMessage])
         })
+        socket.on('client-add_name', (client: clientIdentificationType) => {
+            setName(client.name)
+        })
     }, [])
+
 
     return (
         <div className="App">
@@ -52,10 +65,16 @@ function App() {
                 alignItems: "center",
                 justifyContent: 'center'
             }}>
-                My name is: <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
-                <button onClick={submitName}>submit</button>
+                {isIdentificete
+                    ? <div>{name}</div>
+                    : <div>
+                        My name is: <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
+                        <button onClick={submitName}>submit</button>
+                    </div>}
+
+
                 <textarea value={newMessage} onChange={(e) => setNewMessage(e.currentTarget.value)}/>
-                <button onClick={sendMessage}>SEND</button>
+                <button onClick={sendMessage} disabled={!isIdentificete}>SEND</button>
             </div>
         </div>
     );
