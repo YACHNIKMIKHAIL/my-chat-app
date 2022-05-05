@@ -10,8 +10,8 @@ type MessageType = {
         name: string
     }
 }
-type clientIdentificationType=
-    {id: string, name: string}
+type clientIdentificationType =
+    { id: string, name: string }
 
 const socket = io('http://localhost:8000/')
 
@@ -31,7 +31,7 @@ function App() {
             socket.emit('client-add_name', name)
             setIsIdentificete(true)
 
-
+            localStorage.setItem('clientName', name)
 
         } else {
             alert('Enter name')
@@ -46,9 +46,20 @@ function App() {
         socket.on('new-message-sent', (newMessage: MessageType) => {
             setMessages((messages) => [...messages, newMessage])
         })
-        socket.on('client-add_name', (client: clientIdentificationType) => {
-            setName(client.name)
-        })
+
+        const clientName = localStorage.getItem('clientName')
+
+        console.log(clientName)
+        if(clientName!==null){
+            setName(clientName)
+            setIsIdentificete(true)
+            socket.emit('client-add_name', clientName)
+        } else {
+            setIsIdentificete(false)
+        }
+        // socket.on('client-add_name', (client: clientIdentificationType) => {
+        //     setName(client.name)
+        // })
     }, [])
 
 
