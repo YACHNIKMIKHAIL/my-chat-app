@@ -16,11 +16,15 @@ const socket = io('http://localhost:8000/')
 
 function App() {
     const [messages, setMessages] = useState<MessageType[]>([])
+    const [name, setName] = useState<string>('')
     const [newMessage, setNewMessage] = useState<string>('')
 
     const sendMessage = () => {
         socket.emit('client-send-message', newMessage)
         setNewMessage('')
+    }
+    const submitName = () => {
+        alert(name)
     }
 
     useEffect(() => {
@@ -28,7 +32,7 @@ function App() {
             setMessages(messagesOnBack)
         })
         socket.on('new-message-sent', (newMessage: MessageType) => {
-            setMessages((messages)=>[...messages, newMessage])
+            setMessages((messages) => [...messages, newMessage])
         })
     }, [])
 
@@ -41,7 +45,15 @@ function App() {
                     </div>
                 })}
             </div>
-            <div style={{width: '300px', display: "flex", alignItems: "center", justifyContent: 'center'}}>
+            <div style={{
+                width: '300px',
+                display: "flex",
+                flexDirection: 'column',
+                alignItems: "center",
+                justifyContent: 'center'
+            }}>
+                My name is: <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
+                <button onClick={submitName}>submit</button>
                 <textarea value={newMessage} onChange={(e) => setNewMessage(e.currentTarget.value)}/>
                 <button onClick={sendMessage}>SEND</button>
             </div>
