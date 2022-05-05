@@ -30,6 +30,9 @@ function App() {
         if (name.trim() !== '') {
             socket.emit('client-add_name', name)
             setIsIdentificete(true)
+
+
+
         } else {
             alert('Enter name')
         }
