@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {io} from 'socket.io-client';
 import './App.css';
 
 type MessageType = {
@@ -10,15 +11,26 @@ type MessageType = {
     }
 }
 
+const socket = io('http://localhost:8000/')
+
+
 function App() {
-    const [messages, setMessages] = useState<MessageType[]>([
-        {message: 'Hello, Vitalya', id: '1', user: {id: '11', name: 'Igor'}},
-        {message: 'Igor, Hi bro', id: '2', user: {id: '22', name: 'Vitalya'}}
-    ])
+    const [messages, setMessages] = useState<MessageType[]>([])
     const [newMessage, setNewMessage] = useState<string>('')
+
     const sendMessage = () => {
-        setMessages([...messages, {message: newMessage, id: 'someID', user: {id: 'someID', name: 'My Name'}}])
+        socket.emit('client-send-message', newMessage)
+        setNewMessage('')
     }
+
+    useEffect(() => {
+        socket.on('init-messages-published', (messagesOnBack: MessageType[]) => {
+            setMessages(messagesOnBack)
+        })
+        socket.on('new-message-sent', (newMessage: MessageType) => {
+            setMessages((messages)=>[...messages, newMessage])
+        })
+    }, [])
 
     return (
         <div className="App">
