@@ -23,8 +23,12 @@ function App() {
     const [newMessage, setNewMessage] = useState<string>('')
 
     const sendMessage = () => {
-        socket.emit('client-send-message', newMessage)
-        setNewMessage('')
+        if (newMessage.trim() !== '') {
+            socket.emit('client-send-message', newMessage)
+            setNewMessage('')
+        } else {
+            alert('Enter message')
+        }
     }
     const submitName = () => {
         if (name.trim() !== '') {
@@ -36,7 +40,11 @@ function App() {
         } else {
             alert('Enter name')
         }
-
+    }
+    const exitFromChat = () => {
+        localStorage.clear()
+        setIsIdentificete(false)
+        setName('')
     }
 
     useEffect(() => {
@@ -50,7 +58,7 @@ function App() {
         const clientName = localStorage.getItem('clientName')
 
         console.log(clientName)
-        if(clientName!==null){
+        if (clientName !== null) {
             setName(clientName)
             setIsIdentificete(true)
             socket.emit('client-add_name', clientName)
@@ -80,7 +88,9 @@ function App() {
                 justifyContent: 'center'
             }}>
                 {isIdentificete
-                    ? <div>{name}</div>
+                    ? <div>{name}
+                        <button onClick={exitFromChat}>exit</button>
+                    </div>
                     : <div>
                         My name is: <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
                         <button onClick={submitName}>submit</button>
