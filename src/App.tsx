@@ -13,6 +13,7 @@ type MessageType = {
 type clientIdentificationType =
     { id: string, name: string }
 
+// const socket = io('http://localhost:8000/')
 const socket = io('http://localhost:8000/')
 
 
@@ -90,13 +91,16 @@ function App() {
         <div className="App">
             <div style={{border: '2px black solid', overflowY: "scroll", height: '380px', width: '300px'}}
                  onScroll={(e) => {
-                     if (e.currentTarget.scrollTop < lastScrollTop) {
-                         setLastScrollTop(e.currentTarget.scrollTop)
+                     const element = e.currentTarget
+                     const maxScrollPosition = element.scrollHeight - element.clientHeight
+
+                     if (element.scrollTop < lastScrollTop) {
                          setIsAutoScroll(false)
-                     } else if (e.currentTarget.scrollTop > lastScrollTop) {
-                         setLastScrollTop(e.currentTarget.scrollTop)
+                     } else if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
                          setIsAutoScroll(true)
                      }
+                     setLastScrollTop(element.scrollTop)
+
                  }}>
                 {messages.map(m => {
                     return <div key={m.id} style={{border: '1px black solid', padding: '5px', margin: '10px 0'}}>
