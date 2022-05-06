@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {HTMLAttributes, useEffect, useRef, useState} from 'react';
 import {io} from 'socket.io-client';
 import './App.css';
 
@@ -21,7 +21,16 @@ function App() {
     const [name, setName] = useState<string>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('')
+    const messageAnchorRef = useRef<HTMLDivElement>(null)
 
+
+    const onKeySend = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            sendMessage()
+        } else {
+            return
+        }
+    }
     const sendMessage = () => {
         if (newMessage.trim() !== '') {
             socket.emit('client-send-message', newMessage)
@@ -57,7 +66,6 @@ function App() {
 
         const clientName = localStorage.getItem('clientName')
 
-        console.log(clientName)
         if (clientName !== null) {
             setName(clientName)
             setIsIdentificete(true)
@@ -70,6 +78,9 @@ function App() {
         // })
     }, [])
 
+    useEffect(() => {
+        messageAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
+    }, [messages])
 
     return (
         <div className="App">
@@ -79,6 +90,7 @@ function App() {
                         <b>  {m.user.name}:</b> {m.message}
                     </div>
                 })}
+                <div ref={messageAnchorRef}></div>
             </div>
             <div style={{
                 width: '300px',
@@ -97,7 +109,8 @@ function App() {
                     </div>}
 
 
-                <textarea value={newMessage} onChange={(e) => setNewMessage(e.currentTarget.value)}/>
+                <textarea value={newMessage} onChange={(e) => setNewMessage(e.currentTarget.value)}
+                          onKeyPress={(e) => onKeySend(e)}/>
                 <button onClick={sendMessage} disabled={!isIdentificete}>SEND</button>
             </div>
         </div>
