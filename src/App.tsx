@@ -3,7 +3,7 @@ import {applyMiddleware, combineReducers, createStore} from 'redux';
 import thunk from 'redux-thunk';
 import {io} from 'socket.io-client';
 import './App.css';
-import {chatReducer} from "./ChatReducer";
+import {chatReducer, createConnection, destroyConnection} from "./ChatReducer";
 import {useDispatch, useSelector} from "react-redux";
 
 export type MessageType = {
@@ -17,8 +17,9 @@ export type MessageType = {
 type clientIdentificationType =
     { id: string, name: string }
 
-
-export const store = createStore(combineReducers({chat: chatReducer}), applyMiddleware(thunk))
+const rootReducer = combineReducers({chat: chatReducer})
+type AppStateType = ReturnType<typeof rootReducer>
+export const store = createStore(rootReducer, applyMiddleware(thunk))
 
 function App() {
     const [messages, setMessages] = useState<MessageType[]>([])
@@ -30,7 +31,7 @@ function App() {
     const messageAnchorRef = useRef<HTMLDivElement>(null)
 
     const dispatch = useDispatch()
-    const messagesFromStore = useSelector<MessageType[]>(state => state)
+    const messagesFromStore = useSelector<AppStateType, MessageType[]>(state => state.chat)
 
 
     const onKeySend = (e: React.KeyboardEvent) => {
@@ -66,12 +67,11 @@ function App() {
     }
 
     useEffect(() => {
-        socket.on('init-messages-published', (messagesOnBack: MessageType[]) => {
-            setMessages(messagesOnBack)
-        })
-        socket.on('new-message-sent', (newMessage: MessageType) => {
-            setMessages((messages) => [...messages, newMessage])
-        })
+        dispatch(createConnection())
+        return () => {
+            dispatch(destroyConnection())
+        }
+
 
         const clientName = localStorage.getItem('clientName')
 

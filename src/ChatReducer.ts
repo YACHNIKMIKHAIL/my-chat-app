@@ -1,13 +1,29 @@
 import {MessageType} from "./App";
+import {AnyAction, Dispatch} from "redux";
 
-const initState = [] as MessageType[]
-
-export const chatReducer = (state = initState, action: any): MessageType[] => {
+const initState = {
+    messages: [] as MessageType[]
+}
+type initStateType = typeof initState
+export const chatReducer = (state = initState, action: any): initStateType => {
     switch (action.type) {
-        case'bla': {
-            return state
+        case'messages-received': {
+            return {...state, messages: [...state.messages, action.massages]}
+        }
+        case'new-message-received': {
+            return {...state, messages: [...state.messages, action.massage]}
         }
         default:
             return state
     }
+}
+const messagesReceived = (messages: MessageType[]) => ({type: 'messages-received', messages} as const)
+const newMessageReceived = (message: MessageType) => ({type: 'new-message-received', message} as const)
+
+
+export const createConnection = () => async (dispatch: AnyAction) => {
+
+}
+export const destroyConnection = () => async (dispatch: AnyAction) => {
+
 }
