@@ -1,8 +1,12 @@
 import React, {HTMLAttributes, useEffect, useRef, useState} from 'react';
+import {applyMiddleware, combineReducers, createStore} from 'redux';
+import thunk from 'redux-thunk';
 import {io} from 'socket.io-client';
 import './App.css';
+import {chatReducer} from "./ChatReducer";
+import {useDispatch, useSelector} from "react-redux";
 
-type MessageType = {
+export type MessageType = {
     message: string
     id: string
     user: {
@@ -13,9 +17,8 @@ type MessageType = {
 type clientIdentificationType =
     { id: string, name: string }
 
-// const socket = io('http://localhost:8000/')
-const socket = io('http://localhost:8000/')
 
+export const store = createStore(combineReducers({chat: chatReducer}), applyMiddleware(thunk))
 
 function App() {
     const [messages, setMessages] = useState<MessageType[]>([])
@@ -25,6 +28,9 @@ function App() {
     const [isAutoScroll, setIsAutoScroll] = useState<boolean>(true)
     const [lastScrollTop, setLastScrollTop] = useState<number>(0)
     const messageAnchorRef = useRef<HTMLDivElement>(null)
+
+    const dispatch = useDispatch()
+    const messagesFromStore = useSelector<MessageType[]>(state => state)
 
 
     const onKeySend = (e: React.KeyboardEvent) => {
