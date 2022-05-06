@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/learning-chat-app/static/css/main.806d326d.css",
+    "main.js": "/learning-chat-app/static/js/main.7f24aa1e.js",
+    "static/js/787.28cb0dcd.chunk.js": "/learning-chat-app/static/js/787.28cb0dcd.chunk.js",
+    "index.html": "/learning-chat-app/index.html",
+    "main.806d326d.css.map": "/learning-chat-app/static/css/main.806d326d.css.map",
+    "main.7f24aa1e.js.map": "/learning-chat-app/static/js/main.7f24aa1e.js.map",
+    "787.28cb0dcd.chunk.js.map": "/learning-chat-app/static/js/787.28cb0dcd.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.806d326d.css",
+    "static/js/main.7f24aa1e.js"
+  ]
+}
