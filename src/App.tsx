@@ -17,16 +17,17 @@ type clientIdentificationType =
 
 
 function App() {
+    const messagesFromStore = useSelector((state: AppStateType) => state.chat.messages)
+    debugger
     const [messages, setMessages] = useState<MessageType[]>([])
     const [name, setName] = useState<string | null>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('')
     const [isAutoScroll, setIsAutoScroll] = useState<boolean>(true)
     const [lastScrollTop, setLastScrollTop] = useState<number>(0)
-    const messageAnchorRef = useRef<HTMLDivElement>(null)
 
+    const messageAnchorRef = useRef<HTMLDivElement>(null)
     const dispatch = useDispatch()
-    const messagesFromStore = useSelector<AppStateType, MessageType[]>(state => state.chat.messages)
 
 
     const onKeySend = (e: React.KeyboardEvent) => {
@@ -88,7 +89,8 @@ function App() {
         if (isAutoScroll) {
             messageAnchorRef.current?.scrollIntoView({behavior: 'smooth'})
         }
-    }, [messages, isAutoScroll])
+    }, [isAutoScroll])
+
 
     return (
         <div className="App">
@@ -105,7 +107,7 @@ function App() {
                      setLastScrollTop(element.scrollTop)
 
                  }}>
-                {messages.map(m => {
+                {messagesFromStore.map(m => {
                     return <div key={m.id} style={{border: '1px black solid', padding: '5px', margin: '10px 0'}}>
                         <b>  {m.user.name}:</b> {m.message}
                     </div>
