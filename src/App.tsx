@@ -1,10 +1,8 @@
-import React, {HTMLAttributes, useEffect, useRef, useState} from 'react';
-import {applyMiddleware, combineReducers, createStore} from 'redux';
-import thunk from 'redux-thunk';
-import {io} from 'socket.io-client';
+import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {chatReducer, createConnection, destroyConnection} from "./ChatReducer";
+import {createConnection, destroyConnection, sendMessageTC, sendName} from "./ChatReducer";
 import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "./Store";
 
 export type MessageType = {
     message: string
@@ -17,13 +15,10 @@ export type MessageType = {
 type clientIdentificationType =
     { id: string, name: string }
 
-const rootReducer = combineReducers({chat: chatReducer})
-type AppStateType = ReturnType<typeof rootReducer>
-export const store = createStore(rootReducer, applyMiddleware(thunk))
 
 function App() {
     const [messages, setMessages] = useState<MessageType[]>([])
-    const [name, setName] = useState<string>('')
+    const [name, setName] = useState<string | null>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('')
     const [isAutoScroll, setIsAutoScroll] = useState<boolean>(true)
@@ -31,7 +26,7 @@ function App() {
     const messageAnchorRef = useRef<HTMLDivElement>(null)
 
     const dispatch = useDispatch()
-    const messagesFromStore = useSelector<AppStateType, MessageType[]>(state => state.chat)
+    const messagesFromStore = useSelector<AppStateType, MessageType[]>(state => state.chat.messages)
 
 
     const onKeySend = (e: React.KeyboardEvent) => {
@@ -43,18 +38,20 @@ function App() {
     }
     const sendMessage = () => {
         if (newMessage.trim() !== '') {
-            socket.emit('client-send-message', newMessage)
+            //socket.emit('client-send-message', newMessage)
+            dispatch(sendMessageTC(newMessage))
             setNewMessage('')
         } else {
             alert('Enter message')
         }
     }
     const submitName = () => {
-        if (name.trim() !== '') {
-            socket.emit('client-add_name', name)
-            setIsIdentificete(true)
-
-            localStorage.setItem('clientName', name)
+        if (typeof name === "string") {
+            if (name.trim() !== '') {
+                // socket.emit('client-add_name', name)
+                setIsIdentificete(true)
+                localStorage.setItem('clientName', name)
+            }
 
         } else {
             alert('Enter name')
@@ -72,13 +69,13 @@ function App() {
             dispatch(destroyConnection())
         }
 
-
         const clientName = localStorage.getItem('clientName')
-
         if (clientName !== null) {
             setName(clientName)
             setIsIdentificete(true)
-            socket.emit('client-add_name', clientName)
+            //socket.emit('client-add_name', clientName)
+
+            dispatch(sendName(clientName as string))
         } else {
             setIsIdentificete(false)
         }
@@ -127,7 +124,7 @@ function App() {
                         <button onClick={exitFromChat}>exit</button>
                     </div>
                     : <div>
-                        My name is: <input value={name} onChange={(e) => setName(e.currentTarget.value)}/>
+                        My name is: <input value={name as string} onChange={(e) => setName(e.currentTarget.value)}/>
                         <button onClick={submitName}>submit</button>
                     </div>}
 

@@ -1,5 +1,5 @@
 import {MessageType} from "./App";
-import {AnyAction, Dispatch} from "redux";
+import {chatAPI} from "./ChatAPI";
 
 const initState = {
     messages: [] as MessageType[]
@@ -17,13 +17,26 @@ export const chatReducer = (state = initState, action: any): initStateType => {
             return state
     }
 }
-const messagesReceived = (messages: MessageType[]) => ({type: 'messages-received', messages} as const)
-const newMessageReceived = (message: MessageType) => ({type: 'new-message-received', message} as const)
+export const messagesReceived = (messages: MessageType[]) => ({type: 'messages-received', messages} as const)
+export const newMessageReceived = (message: MessageType) => ({type: 'new-message-received', message} as const)
 
 
-export const createConnection = () => async (dispatch: AnyAction) => {
-
+export const createConnection = ():any => (dispatch:any) => {
+    chatAPI.createConnection()
+    chatAPI.subscribe((messages: MessageType[]) => {
+            dispatch(messagesReceived(messages))
+        },
+        (message: MessageType) => {
+            dispatch(newMessageReceived(message))
+        })
 }
-export const destroyConnection = () => async (dispatch: AnyAction) => {
-
+export const destroyConnection = ():any => (dispatch:any) => {
+    chatAPI.destroyConnection()
+}
+export const sendName = (clientName: string):any => (dispatch:any) => {
+    if (clientName)
+        chatAPI.sendName(clientName)
+}
+export const sendMessageTC = (message: string):any => (dispatch:any) => {
+    chatAPI.sendMessage(message)
 }
