@@ -17,7 +17,6 @@ export type MessageType = {
 function App() {
     const messagesFromStore = useSelector((state: AppStateType) => state.chat.messages)
     const typingUsers = useSelector((state: AppStateType) => state.chat.typingUsers)
-    const [messages, setMessages] = useState<MessageType[]>([])
     const [name, setName] = useState<string | null>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
     const [newMessage, setNewMessage] = useState<string>('')
@@ -82,7 +81,7 @@ function App() {
         // socket.on('client-add_name', (client: clientIdentificationType) => {
         //     setName(client.name)
         // })
-    }, [])
+    }, [dispatch])
 
     useEffect(() => {
         if (isAutoScroll) {
@@ -111,12 +110,15 @@ function App() {
                         <b>  {m.user.name}:</b> {m.message}
                     </div>
                 })}
+                {typingUsers.map(m => {
+                    return <div key={m.id}>{m.name} ...typed</div>
+                })}
                 <div ref={messageAnchorRef}></div>
-                {typingUsers && <div>
-                    {typingUsers.map(m => {
-                        return <div key={m.id}>{m.name} ...typed</div>
-                    })}
-                </div>}
+                {/*{typingUsers && <div>*/}
+                {/*    {typingUsers.map(m => {*/}
+                {/*        return <div key={m.id}>{m.name} ...typed</div>*/}
+                {/*    })}*/}
+                {/*</div>}*/}
             </div>
             <div style={{
                 width: '300px',

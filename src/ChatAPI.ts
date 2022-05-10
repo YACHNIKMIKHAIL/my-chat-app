@@ -12,7 +12,7 @@ export const chatAPI = {
         this.socket = io('http://localhost:8000/')
         // this.socket = io('https://my-chat-back.herokuapp.com/')
     },
-     subscribe(initMessagesHandler: (messagesOnBack: MessageType[]) => void,
+    subscribe(initMessagesHandler: (messagesOnBack: MessageType[]) => void,
               newMessageSentHandler: (newMessage: MessageType) => void,
               userTypingHandler: (user: UserType) => void,
     ) {
@@ -28,7 +28,11 @@ export const chatAPI = {
         this.socket?.emit('client-add_name', clientName)
     },
     sendMessage(newMessage: string) {
-        this.socket?.emit('client-send-message', newMessage)
+        this.socket?.emit('client-send-message', newMessage, (error: string | null) => {
+            if (error) {
+                alert(error)
+            }
+        })
     },
     typeMessage() {
         this.socket?.emit('client-type-message')
