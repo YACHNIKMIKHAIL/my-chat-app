@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './App.css';
-import {createConnection, destroyConnection, sendMessageTC, sendName} from "./ChatReducer";
+import {createConnection, destroyConnection, sendMessageTC, sendName, typeMessage} from "./ChatReducer";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "./Store";
 
@@ -18,7 +18,6 @@ type clientIdentificationType =
 
 function App() {
     const messagesFromStore = useSelector((state: AppStateType) => state.chat.messages)
-    debugger
     const [messages, setMessages] = useState<MessageType[]>([])
     const [name, setName] = useState<string | null>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
@@ -50,8 +49,9 @@ function App() {
         if (typeof name === "string") {
             if (name.trim() !== '') {
                 // socket.emit('client-add_name', name)
+                dispatch(sendName(name))
                 setIsIdentificete(true)
-                localStorage.setItem('clientName', name)
+                // localStorage.setItem('clientName', name)
             }
 
         } else {
@@ -59,7 +59,7 @@ function App() {
         }
     }
     const exitFromChat = () => {
-        localStorage.clear()
+        // localStorage.clear()
         setIsIdentificete(false)
         setName('')
     }
@@ -70,16 +70,16 @@ function App() {
             dispatch(destroyConnection())
         }
 
-        const clientName = localStorage.getItem('clientName')
-        if (clientName !== null) {
-            setName(clientName)
-            setIsIdentificete(true)
-            //socket.emit('client-add_name', clientName)
-
-            dispatch(sendName(clientName as string))
-        } else {
-            setIsIdentificete(false)
-        }
+        // const clientName = localStorage.getItem('clientName')
+        // if (clientName !== null) {
+        //     setName(clientName)
+        //     setIsIdentificete(true)
+        //     //socket.emit('client-add_name', clientName)
+        //
+        //     dispatch(sendName(clientName as string))
+        // } else {
+        //     setIsIdentificete(false)
+        // }
         // socket.on('client-add_name', (client: clientIdentificationType) => {
         //     setName(client.name)
         // })
@@ -99,10 +99,10 @@ function App() {
                      const element = e.currentTarget
                      const maxScrollPosition = element.scrollHeight - element.clientHeight
 
-                     if (element.scrollTop < lastScrollTop) {
-                         setIsAutoScroll(false)
-                     } else if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
+                     if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
                          setIsAutoScroll(true)
+                     }else{
+                         setIsAutoScroll(false)
                      }
                      setLastScrollTop(element.scrollTop)
 
@@ -132,7 +132,10 @@ function App() {
 
 
                 <textarea value={newMessage} onChange={(e) => setNewMessage(e.currentTarget.value)}
-                          onKeyPress={(e) => onKeySend(e)}/>
+                          onKeyPress={(e) => {
+                              onKeySend(e)
+                              dispatch(typeMessage())
+                          }}/>
                 <button onClick={sendMessage} disabled={!isIdentificete}>SEND</button>
             </div>
         </div>
