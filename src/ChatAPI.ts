@@ -18,7 +18,7 @@ export const chatAPI = {
     ) {
         this.socket?.on('init-messages-published', initMessagesHandler)
         this.socket?.on('new-message-sent', newMessageSentHandler)
-        this.socket?.on('client-type-message', userTypingHandler)
+        this.socket?.on('user-type-message', userTypingHandler)
     },
     destroyConnection() {
         this.socket?.disconnect()

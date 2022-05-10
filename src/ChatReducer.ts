@@ -10,14 +10,20 @@ const initState = {
     typingUsers: [] as UserType[]
 }
 type initStateType = typeof initState
-export const chatReducer = (state = initState, action: any): initStateType => {
+export const chatReducer = (state = initState, action: chatReducerActionTypes): initStateType => {
     switch (action.type) {
         case'messages-received': {
 
             return {...state, messages: [...state.messages, ...action.messages]}
         }
         case'new-message-received': {
-            return {...state, messages: [...state.messages, action.message]}
+            return {
+                ...state, messages: [...state.messages, action.message],
+                typingUsers: state.typingUsers.filter(f => f.id !== action.message.user.id)
+            }
+        }
+        case'client-type-message': {
+            return {...state, typingUsers: [action.user, ...state.typingUsers.filter(f => f.id !== action.user.id)]}
         }
         default:
             return state
@@ -25,11 +31,12 @@ export const chatReducer = (state = initState, action: any): initStateType => {
 }
 export const messagesReceived = (messages: MessageType[]) => ({type: 'messages-received', messages} as const)
 export const newMessageReceived = (message: MessageType) => ({type: 'new-message-received', message} as const)
-export const userTypeMessage = (user: {
-    id: string
-    name: string
-}) => ({type: 'client-type-message', user} as const)
+export const userTypeMessage = (user: UserType) => ({type: 'client-type-message', user} as const)
 
+type chatReducerActionTypes =
+    ReturnType<typeof messagesReceived>
+    | ReturnType<typeof newMessageReceived>
+    | ReturnType<typeof userTypeMessage>
 
 export const createConnection = (): any => (dispatch: any) => {
     chatAPI.createConnection()

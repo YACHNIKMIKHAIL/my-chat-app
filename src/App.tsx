@@ -12,12 +12,11 @@ export type MessageType = {
         name: string
     }
 }
-type clientIdentificationType =
-    { id: string, name: string }
 
 
 function App() {
     const messagesFromStore = useSelector((state: AppStateType) => state.chat.messages)
+    const typingUsers = useSelector((state: AppStateType) => state.chat.typingUsers)
     const [messages, setMessages] = useState<MessageType[]>([])
     const [name, setName] = useState<string | null>('')
     const [isIdentificete, setIsIdentificete] = useState<boolean>(false)
@@ -101,7 +100,7 @@ function App() {
 
                      if (element.scrollTop > lastScrollTop && Math.abs(maxScrollPosition - element.scrollTop) < 10) {
                          setIsAutoScroll(true)
-                     }else{
+                     } else {
                          setIsAutoScroll(false)
                      }
                      setLastScrollTop(element.scrollTop)
@@ -113,6 +112,11 @@ function App() {
                     </div>
                 })}
                 <div ref={messageAnchorRef}></div>
+                {typingUsers && <div>
+                    {typingUsers.map(m => {
+                        return <div key={m.id}>{m.name} ...typed</div>
+                    })}
+                </div>}
             </div>
             <div style={{
                 width: '300px',
